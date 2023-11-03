@@ -69,7 +69,7 @@ public class LinkedQueue<E> implements java.util.Queue<E> {
 
   @Override
   public Object[] toArray() {
-    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MSG);
+    return list.toArray();
   }
 
   @Override
