@@ -122,12 +122,17 @@ public class LinkedList<E> implements java.util.List<E> {
 
   @Override
   public Object[] toArray() {
-    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MSG);
+    Object[] result = new Object[this.size()];
+    int i = 0;
+    for (Node<E> x = first; x != null; x = x.next) {
+      result[i] = x.item;
+      i++;
+    }
+    return result;
   }
 
   @Override
   public <T> T[] toArray(T[] a) {
-
     throw new UnsupportedOperationException(NOT_IMPLEMENTED_MSG);
   }
 
