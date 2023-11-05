@@ -2,7 +2,7 @@ package ru.spbu.apcyb.svp.tasks.task1;
 
 
 import static java.lang.Integer.parseInt;
-import static ru.spbu.apcyb.svp.tasks.task1.Atm.computeCombinations;
+import static ru.spbu.apcyb.svp.tasks.task1.Atm.getCombinations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,18 +21,28 @@ public class Task1 {
 
     Scanner sc = new Scanner(System.in);
 
-    List<Integer> nums;
-    int sum = parseInt(sc.nextLine());
+    System.out.print("Enter amount: ");
+    int sum = parseInteger(sc.nextLine());
 
+    System.out.print("Enter denominations: ");
     String numbers = sc.nextLine();
-    nums = new ArrayList<>(Arrays
+    List<Integer> nums = new ArrayList<>(Arrays
         .stream(numbers.split("\\s"))
-        .map(Integer::parseInt)
+        .filter(s -> !s.isEmpty())
+        .map(Task1::parseInteger)
         .toList());
     sc.close();
 
-    List<List<Integer>> ans = computeCombinations(sum, nums);
+    List<List<Integer>> ans = getCombinations(sum, nums);
     System.out.println(ans.size());
     ans.forEach(System.out::println);
+  }
+
+  public static int parseInteger(String s) {
+    try {
+      return parseInt(s);
+    } catch (NumberFormatException e) {
+      throw new NumberFormatException("unable to convert string \"" + s + "\" to integer");
+    }
   }
 }
