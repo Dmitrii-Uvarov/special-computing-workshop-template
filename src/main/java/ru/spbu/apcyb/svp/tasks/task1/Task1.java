@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Задание 1. Банкомат
@@ -42,7 +44,18 @@ public class Task1 {
     try {
       return parseInt(s);
     } catch (NumberFormatException e) {
-      throw new NumberFormatException("unable to convert string \"" + s + "\" to integer");
+      if (Pattern.compile(".*[^-+0-9]+.*").matcher(s).matches()) {
+        throw new NumberFormatException(
+            "for string \"" + s + "\": an integer consists only of a sign and digits from 0 to 9");
+      }
+      int pc= StringUtils.countMatches(s, '+');
+      int mc = StringUtils.countMatches(s, '-');
+      if (pc + mc > 1){
+        throw new NumberFormatException(
+            "for string \"" + s + "\": too many sign symbols for an integer");
+      }
+      throw new NumberFormatException(
+          "for string \"" + s + "\": the sign must go ahead of a number");
     }
   }
 }
