@@ -44,9 +44,8 @@ public class Task1 {
     try {
       return parseInt(s);
     } catch (NumberFormatException e) {
-      String nanPattern = ".*[^-+0-9]+.*";
       String forStr = "for string \"" + s + "\"";
-      if (Pattern.compile(nanPattern).matcher(s).matches()) {
+      if (Pattern.compile("[^-+0-9]").matcher(s).find()) {
         throw new NumberFormatException(
             forStr + ": an integer consists only of a sign and digits from 0 to 9");
       }
