@@ -44,18 +44,20 @@ public class Task1 {
     try {
       return parseInt(s);
     } catch (NumberFormatException e) {
-      if (Pattern.compile(".*[^-+0-9]+.*").matcher(s).matches()) {
+      String nanPattern = ".*[^-+0-9]+.*";
+      String forStr = "for string \"" + s + "\"";
+      if (Pattern.compile(nanPattern).matcher(s).matches()) {
         throw new NumberFormatException(
-            "for string \"" + s + "\": an integer consists only of a sign and digits from 0 to 9");
+            forStr + ": an integer consists only of a sign and digits from 0 to 9");
       }
       int pc= StringUtils.countMatches(s, '+');
       int mc = StringUtils.countMatches(s, '-');
       if (pc + mc > 1){
         throw new NumberFormatException(
-            "for string \"" + s + "\": too many sign symbols for an integer");
+            forStr + ": too many sign symbols for an integer");
       }
       throw new NumberFormatException(
-          "for string \"" + s + "\": the sign must go ahead of a number");
+          forStr + ": the sign must go ahead of a number");
     }
   }
 }
