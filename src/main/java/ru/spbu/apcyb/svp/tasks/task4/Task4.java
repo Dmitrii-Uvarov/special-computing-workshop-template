@@ -78,11 +78,9 @@ public class Task4 {
 
     List<Future<String>> futures = new ArrayList<>();
     List<Double> buff = new ArrayList<>();
-    int i = 0;
     while (sc.hasNextDouble()) {
       buff.add(sc.nextDouble());
-      i++;
-      if (i % numsPerThread == 0) {
+      if (buff.size() >= numsPerThread) {
         List<Double> h = new ArrayList<>(buff);
         futures.add(exService.submit(() -> countTanForOneLine(h)));
         buff.clear();
