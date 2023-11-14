@@ -59,13 +59,13 @@ public class Task4 {
 
   public static void singleThreadTan(String numbersFile, String singleAnswerFile)
       throws IOException {
-    var sc = new Scanner(new FileReader(numbersFile)).useLocale(Locale.US);
-    var fileWriter = new FileWriter(singleAnswerFile);
-    while (sc.hasNextDouble()) {
-      fileWriter.write(Math.tan(sc.nextDouble()) + System.lineSeparator());
+    try (var sc = new Scanner(new FileReader(numbersFile)).useLocale(Locale.US);
+        var fileWriter = new FileWriter(singleAnswerFile);) {
+      while (sc.hasNextDouble()) {
+        fileWriter.write(Math.tan(sc.nextDouble()) + System.lineSeparator());
+      }
+      fileWriter.flush();
     }
-    fileWriter.flush();
-    sc.close();
   }
 
 
@@ -73,31 +73,35 @@ public class Task4 {
       int numsPerThread)
       throws IOException, ExecutionException, InterruptedException {
 
-    var exService = Executors.newFixedThreadPool(threadCount);
-    Scanner sc = new Scanner(new FileReader(numbersFile)).useLocale(Locale.US);
-
     List<Future<String>> futures = new ArrayList<>();
-    List<Double> buff = new ArrayList<>();
-    while (sc.hasNextDouble()) {
-      buff.add(sc.nextDouble());
-      if (buff.size() >= numsPerThread) {
-        List<Double> h = new ArrayList<>(buff);
-        futures.add(exService.submit(() -> countTanForOneLine(h)));
-        buff.clear();
-      }
-    }
-    if (!buff.isEmpty()) {
-      futures.add(exService.submit(() -> countTanForOneLine(new ArrayList<>(buff))));
-    }
-    sc.close();
+    ExecutorService exService = null;
+    try {
+      exService = Executors.newFixedThreadPool(threadCount);
+      try (Scanner sc = new Scanner(new FileReader(numbersFile)).useLocale(Locale.US);
+          FileWriter fileWriter = new FileWriter(multiAnswerFile)) {
 
-    try (var fileWriter = new FileWriter(multiAnswerFile)) {
-      for (var future : futures) {
-        fileWriter.write(future.get());
+        List<Double> buff = new ArrayList<>();
+        while (sc.hasNextDouble()) {
+          buff.add(sc.nextDouble());
+          if (buff.size() >= numsPerThread) {
+            List<Double> h = new ArrayList<>(buff);
+            futures.add(exService.submit(() -> countTanForOneLine(h)));
+            buff.clear();
+          }
+        }
+        if (!buff.isEmpty()) {
+          futures.add(exService.submit(() -> countTanForOneLine(new ArrayList<>(buff))));
+        }
+
+        for (var future : futures) {
+          fileWriter.write(future.get());
+        }
       }
-      fileWriter.flush();
+    } finally {
+      if (exService != null) {
+        exService.shutdown();
+      }
     }
-    exService.shutdown();
   }
 
   private static String countTanForOneLine(List<Double> line) {
