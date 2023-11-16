@@ -26,22 +26,20 @@ public class Task4 {
     String multiAnswerFile = "./src/main/resources/tanAnsMulti.txt";
     int numsCount = 100000;
     int threadCount = 4;
-    int numsPerThreadCount = 1000;
 
-    run(numbersFile, singleAnswerFile, multiAnswerFile, numsCount, threadCount, numsPerThreadCount);
+    run(numbersFile, singleAnswerFile, multiAnswerFile, numsCount, threadCount);
   }
 
   public static void run(String numbersFile, String singleAnswerFile, String multiAnswerFile,
-      int numsCount, int threadCount, int numsPerThreadCount)
+      int numsCount, int threadCount)
       throws IOException, ExecutionException, InterruptedException {
 
     String msg = """
         multi-thread vs single-thread tangent comparison
         amount of numbers in file: %d
         amount of threads: %d
-        amount of numbers per thread: %d
         ----------------------------------------
-        """.formatted(numsCount, threadCount, numsPerThreadCount);
+        """.formatted(numsCount, threadCount);
     logger.log(Level.INFO, msg);
 
     NumberGenerator.generateSequence(numbersFile, numsCount);
@@ -52,7 +50,7 @@ public class Task4 {
     logger.log(Level.INFO, "single-thread time: {0} ms", singleEnd - singleStart);
 
     var multiStart = System.currentTimeMillis();
-    multiThreadTan(numbersFile, multiAnswerFile, threadCount, numsPerThreadCount);
+    multiThreadTan(numbersFile, multiAnswerFile, threadCount);
     var multiEnd = System.currentTimeMillis();
     logger.log(Level.INFO, "multi-thread time: {0} ms", multiEnd - multiStart);
   }
@@ -64,37 +62,26 @@ public class Task4 {
       while (sc.hasNextDouble()) {
         fileWriter.write(Math.tan(sc.nextDouble()) + System.lineSeparator());
       }
-      fileWriter.flush();
     }
   }
 
 
-  private static void multiThreadTan(String numbersFile, String multiAnswerFile, int threadCount,
-      int numsPerThread)
+  private static void multiThreadTan(String numbersFile, String multiAnswerFile, int threadCount)
       throws IOException, ExecutionException, InterruptedException {
 
-    List<Future<String>> futures = new ArrayList<>();
+    List<Future<Double>> futures = new ArrayList<>();
     ExecutorService exService = null;
     try {
       exService = Executors.newFixedThreadPool(threadCount);
       try (Scanner sc = new Scanner(new FileReader(numbersFile)).useLocale(Locale.US);
           FileWriter fileWriter = new FileWriter(multiAnswerFile)) {
 
-        List<Double> buff = new ArrayList<>();
         while (sc.hasNextDouble()) {
-          buff.add(sc.nextDouble());
-          if (buff.size() >= numsPerThread) {
-            List<Double> h = new ArrayList<>(buff);
-            futures.add(exService.submit(() -> countTanForOneLine(h)));
-            buff.clear();
-          }
+          double x = sc.nextDouble();
+          futures.add(exService.submit(() -> Math.tan(x)));
         }
-        if (!buff.isEmpty()) {
-          futures.add(exService.submit(() -> countTanForOneLine(new ArrayList<>(buff))));
-        }
-
         for (var future : futures) {
-          fileWriter.write(future.get());
+          fileWriter.write(future.get() + System.lineSeparator());
         }
       }
     } finally {
@@ -102,12 +89,6 @@ public class Task4 {
         exService.shutdown();
       }
     }
-  }
-
-  private static String countTanForOneLine(List<Double> line) {
-    var answer = new StringBuilder();
-    line.forEach(d -> answer.append(Math.tan(d)).append(System.lineSeparator()));
-    return answer.toString();
   }
 }
 
