@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 
 public class Task3 {
 
@@ -33,47 +34,39 @@ public class Task3 {
 
   public static String buildTree(Path root) {
     StringBuilder sb = new StringBuilder();
-    buildTreeRecursive(root, 0, sb);
+    printDirectory(root, "", sb);
+    buildTreeRecursive(root, "", sb);
     return sb.toString();
   }
 
-  public static void buildTreeRecursive(Path root, int i, StringBuilder sb) {
-    printDirectory(root, i, sb);
-    try (var files = Files.list(root)) {
-      files.forEach(p -> {
-        if (Files.isDirectory(p)) {
-          buildTreeRecursive(p, i + 1, sb);
+  public static void buildTreeRecursive(Path file, String indent, StringBuilder sb) {
+    try (var files = Files.list(file)) {
+      Iterator<Path> it = files.iterator();
+      while (it.hasNext()) {
+        Path f = it.next();
+        if (Files.isDirectory(f)) {
+          printDirectory(f, indent + (it.hasNext() ? "├── " : "└── "), sb);
+          buildTreeRecursive(f, indent + (it.hasNext() ? "│   " : "    "), sb);
         } else {
-          printFile(p, i + 1, sb);
+          printFile(f, indent + (it.hasNext() ? "├── " : "└── "), sb);
         }
-      });
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static void printFile(Path file, int indent, StringBuilder sb) {
-    sb.append(getIndentString(indent));
-    sb.append(file.getFileName());
-    sb.append(System.lineSeparator());
+  private static void printFile(Path file, String indent, StringBuilder sb) {
+    sb.append(indent)
+        .append(file.getFileName())
+        .append(System.lineSeparator());
   }
 
-  private static void printDirectory(Path dir, int indent, StringBuilder sb) {
-    sb.append(getIndentString(indent));
-    sb.append(dir.getFileName());
-    sb.append("/");
-    sb.append(System.lineSeparator());
-  }
-
-  private static String getIndentString(int indent) {
-    if (indent == 0) {
-      return "";
-    }
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent - 1; i++) {
-      sb.append("│   ");
-    }
-    sb.append("├── ");
-    return sb.toString();
+  private static void printDirectory(Path file, String indent, StringBuilder sb) {
+    sb.append(indent)
+        .append(file.getFileName())
+        .append("/")
+        .append(System.lineSeparator());
   }
 }
+

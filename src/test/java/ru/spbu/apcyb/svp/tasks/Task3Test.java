@@ -22,20 +22,20 @@ class Task3Test {
         ├── empty/\r
         ├── foo/\r
         │   ├── another_one/\r
-        │   │   ├── another_one/\r
-        │   │   │   ├── another_one/\r
-        │   │   │   │   ├── another_one/\r
-        │   │   │   │   │   ├── another_one/\r
-        │   │   │   │   │   │   ├── DJ_KHALED_WISE_WORDS.txt\r
+        │   │   └── another_one/\r
+        │   │       └── another_one/\r
+        │   │           └── another_one/\r
+        │   │               └── another_one/\r
+        │   │                   └── DJ_KHALED_WISE_WORDS.txt\r
         │   ├── bar.txt\r
-        │   ├── baz.txt\r
-        ├── some/\r
-        │   ├── a.txt\r
-        │   ├── b.txt\r
-        │   ├── c.txt\r
-        │   ├── d/\r
-        │   │   ├── E.txt\r
-                """;
+        │   └── baz.txt\r
+        └── some/\r
+            ├── a.txt\r
+            ├── b.txt\r
+            ├── c.txt\r
+            └── d/\r
+                └── E.txt\r
+                        """;
 
     try (FileWriter output = new FileWriter(pathToFile)) {
       output.write(g);
