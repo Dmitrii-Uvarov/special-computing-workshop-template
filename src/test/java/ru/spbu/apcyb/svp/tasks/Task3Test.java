@@ -14,7 +14,7 @@ class Task3Test {
   @Test
   void directoryScanTest() throws IOException {
     String directoryPath = "src/test/resources/task3/TestDirectory";
-    String treeFolder = "src/test/resources/task3";
+    String treeFilePath = "src/test/resources/task3/file_tree.txt";
     String pathToFile = "src/test/resources/task3/TestDirectory_expected.txt";
 
     String g = """ 
@@ -42,14 +42,13 @@ class Task3Test {
     }
 
     Path path = Path.of(directoryPath);
-    Path filepath = Path.of(treeFolder);
+    Path filepath = Path.of(treeFilePath);
     Task3.getFileStructure(path, filepath);
 
-    Path expectedPathToResult = filepath.resolve("file_structure.txt");
-    if (Files.notExists(expectedPathToResult)) {
+    if (Files.notExists(filepath)) {
       fail("Cannot find result file at expected path.");
     }
 
-    assertEquals(-1, Files.mismatch(Path.of(pathToFile), expectedPathToResult));
+    assertEquals(-1, Files.mismatch(Path.of(pathToFile), filepath));
   }
 }

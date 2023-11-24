@@ -8,7 +8,24 @@ import java.util.Iterator;
 
 public class Task3 {
 
+  private static final String FILE_EDGE = "├── ";
+  private static final String LAST_FILE_EDGE = "└── ";
+  private static final String DIR_INDENT = "│   ";
+  private static final String LAST_DIR_INDENT = "    ";
+
+  private static final String WRONG_MAIN_ARGS_MSG = """
+      Incorrect amount of arguments. Should be two strings: path to directory that should be
+      scanned and path to file where a file tree will be saved.
+      """;
+  private static final String FILE_TREE_WRITE_ERROR_MSG =
+      "Failed to write directory structure tree to file";
+
+  private static final String DIR_ENTRIES_ERROR_MSG = "Failed to get entries of the directory";
+
   public static void main(String[] args) {
+    if (args.length != 2) {
+      throw new IllegalArgumentException(WRONG_MAIN_ARGS_MSG);
+    }
     Path r = Path.of(args[0]);
     Path d = Path.of(args[1]);
     getFileStructure(r, d);
@@ -17,18 +34,16 @@ public class Task3 {
   /**
    * Builds a directory file tree and saves it to a .txt file.
    *
-   * @param rootdir directory to build file tree for.
-   * @param destdir directory to save the file tree. The tree will be saved in the file
-   *                file_structure.txt.
+   * @param rootPath     directory path to build file tree for.
+   * @param destFilePath txt file path to save the file tree.
    */
-  public static void getFileStructure(Path rootdir, Path destdir) {
-    Path strctPath = destdir.resolve("file_structure.txt");
-    String structure = buildTree(rootdir);
+  public static void getFileStructure(Path rootPath, Path destFilePath) {
+    String structure = buildTree(rootPath);
     System.out.println(structure);
-    try (var file = new FileWriter(strctPath.toFile())) {
+    try (var file = new FileWriter(destFilePath.toFile())) {
       file.write(structure);
     } catch (IOException e) {
-      throw new RuntimeException("Failed to write directory structure tree to file", e);
+      throw new RuntimeException(FILE_TREE_WRITE_ERROR_MSG, e);
     }
   }
 
@@ -45,14 +60,14 @@ public class Task3 {
       while (it.hasNext()) {
         Path f = it.next();
         if (Files.isDirectory(f)) {
-          printDirectory(f, indent + (it.hasNext() ? "├── " : "└── "), sb);
-          buildTreeRecursive(f, indent + (it.hasNext() ? "│   " : "    "), sb);
+          printDirectory(f, indent + (it.hasNext() ? FILE_EDGE : LAST_FILE_EDGE), sb);
+          buildTreeRecursive(f, indent + (it.hasNext() ? DIR_INDENT : LAST_DIR_INDENT), sb);
         } else {
-          printFile(f, indent + (it.hasNext() ? "├── " : "└── "), sb);
+          printFile(f, indent + (it.hasNext() ? FILE_EDGE : LAST_FILE_EDGE), sb);
         }
       }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException(DIR_ENTRIES_ERROR_MSG,e);
     }
   }
 
